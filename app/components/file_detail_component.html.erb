@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+  <head>
+    <title><%= file_name %> · <%= @repository.name %> · Forge</title>
+    <style>
+      <%= Rouge::Themes::ThankfulEyes.render(scope: '.highlight') %>
+      body { margin: 0; color: #c9d1d9; background: #0d1117; font: 16px/1.5 system-ui, sans-serif; } header { padding: 1rem max(5vw, 1.5rem); background: #161b22; border-bottom: 1px solid #30363d; } main { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; } a { color: #58a6ff; text-decoration: none; } .crumbs { color: #8b949e; margin-bottom: 1rem; } .file-header { display: flex; justify-content: space-between; padding: .75rem 1rem; background: #161b22; border: 1px solid #30363d; border-radius: 6px 6px 0 0; } .file-header code { color: #f0f6fc; } .language { color: #8b949e; } .highlight { overflow: auto; border: 1px solid #30363d; border-top: 0; border-radius: 0 0 6px 6px; background: #0d1117; } pre { margin: 0; padding: 1rem; font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; tab-size: 2; } .empty-preview { padding: 2rem; color: #8b949e; }
+    </style>
+  </head>
+  <body>
+    <header><strong>◈ Forge</strong></header>
+    <main>
+      <p class="crumbs"><a href="<%= repository_path(@repository.owner.login, @repository.name, path: parent_path) %>">← <%= @repository.owner.login %>/<%= @repository.name %></a> / <strong><%= @path %></strong></p>
+      <div class="file-header"><code><%= file_name %></code><span class="language"><%= language %></span></div>
+      <div class="highlight"><pre><code><%= highlighted_content %></code></pre></div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+FROM alpine:3.21
+
+RUN apk add --no-cache git openssh \
+  && adduser -D -h /git -s /usr/bin/git-shell forge \
+  && mkdir -p /var/run/sshd /git
+
+COPY docker/git-entrypoint.sh /usr/local/bin/git-entrypoint
+RUN chmod +x /usr/local/bin/git-entrypoint
+
+EXPOSE 22
+ENTRYPOINT ["/usr/local/bin/git-entrypoint"]

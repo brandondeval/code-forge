@@ -1,0 +1,13 @@
+source "https://rubygems.org"
+
+ruby ">= 3.3.0", "< 3.4"
+gem "rails", "~> 8.0"
+gem "pg", "~> 1.5"
+gem "puma", ">= 6.0"
+gem "view_component", "~> 4.12"
+gem "rack-cors"
+gem "bcrypt", "~> 3.1"
+gem "jwt", "~> 2.9"
+gem "rubyzip", "~> 3.0"
+gem "rouge", "~> 4.0"
+gem "diff-lcs", "~> 1.5"

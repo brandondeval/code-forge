@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Forge component previews</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 800px; margin: 3rem auto; color: #24292f; }
+      .repository-card { border: 1px solid #d0d7de; border-radius: 6px; padding: 1rem; margin: .75rem 0; display: grid; grid-template-columns: 1fr auto; gap: .5rem; }
+      h1, h2, p { margin: 0; } h2 { font-size: 1rem; color: #0969da; } p { color: #57606a; margin-top: .5rem; }
+      footer { grid-column: 1 / -1; color: #57606a; font-size: .9rem; } .badge { border: 1px solid #d0d7de; border-radius: 2em; height: fit-content; padding: .1rem .5rem; font-size: .75rem; } .badge--private { color: #8250df; }
+    </style>
+  </head>
+  <body>
+    <h1>Forge ViewComponents</h1>
+    <p>These shared Rails components can be rendered in traditional server views, emails, or previews.</p>
+    <% @repositories.each do |repository| %>
+      <%= render RepositoryCardComponent.new(repository: repository) %>
+    <% end %>
+  </body>
+</html>

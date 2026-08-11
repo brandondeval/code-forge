@@ -1,0 +1,39 @@
+<section class="code-overview">
+  <div class="code-toolbar"><button class="branch-picker switcher-toggle" type="button">⌘ <strong><%= selected_ref_name %></strong> ▾</button><span class="branch-count">⌘ <strong><%= branches.count %> Branches</strong></span><span class="branch-count">◇ <strong><%= tags.count %> Tags</strong></span><span class="file-search">⌕ Go to file</span><a class="commit-link" href="<%= repository_commits_path(@repository.owner.login, @repository.name, branch: selected_branch&.name || @repository.default_branch) %>"><code><%= short_sha %></code> Commits</a></div>
+  <div class="ref-switcher" hidden><div class="switcher-title"><strong>Switch branches/tags</strong><button type="button" class="switcher-close">×</button></div><input class="ref-search" type="search" placeholder="Find a branch..." autofocus /><div class="ref-tabs"><button class="ref-tab" type="button" data-ref-panel="branches" aria-selected="true">Branches</button><button class="ref-tab" type="button" data-ref-panel="tags" aria-selected="false">Tags</button></div><div class="ref-panel" data-ref-panel-content="branches"><% branches.each do |branch| %><a data-ref-name="<%= branch.name.downcase %>" href="<%= repository_path(@repository.owner.login, @repository.name, branch: branch.name) %>"><%= "✓ " if !selected_tag && selected_branch&.name == branch.name %><strong><%= branch.name %></strong><%= " <span>default</span>".html_safe if branch.name == @repository.default_branch %></a><% end %></div><div class="ref-panel" data-ref-panel-content="tags" hidden><% if tags.any? %><% tags.each do |tag| %><a data-ref-name="<%= tag.name.downcase %>" href="<%= repository_path(@repository.owner.login, @repository.name, tag: tag.name) %>"><%= "✓ " if selected_tag&.name == tag.name %>◇ <strong><%= tag.name %></strong></a><% end %><% else %><p>No tags yet.</p><% end %></div></div>
+  <div class="code-workspace">
+    <aside class="file-explorer">
+      <div class="commit-summary"><span class="commit-avatar">◈</span><span><strong><%= @repository.owner.login %></strong> updated <strong><%= @repository.default_branch %></strong></span><code title="<%= @repository.current_commit_sha %>"><%= short_sha %></code></div>
+      <div class="file-list">
+        <% if tree_empty? %><p class="empty-files">No imported files yet.</p><% else %><%= render FileTreeComponent.new(repository: @repository, directory: tree_root, path: tree_root_path, ref_params: ref_params) %><% end %>
+      </div>
+    </aside>
+    <section class="preview-pane" id="file-preview"><% if selected_file %><%= render FilePreviewComponent.new(repository: @repository, path: @file, file_path: selected_file) %><% else %><div class="preview-empty"><span>▱</span><strong>Select a file to preview it</strong><p>Choose a file from the explorer. Use folders and breadcrumbs to navigate the repository.</p></div><% end %></section>
+  </div>
+  <script>
+    document.querySelectorAll('.folder-toggle').forEach((button) => button.addEventListener('click', () => {
+      const children = button.parentElement.nextElementSibling;
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', String(!expanded));
+      children.hidden = expanded;
+    }));
+    document.querySelectorAll('.file-link').forEach((link) => link.addEventListener('click', async (event) => {
+      event.preventDefault();
+      const preview = document.querySelector('.preview-pane');
+      preview.innerHTML = '<div class="preview-empty"><span class="spinner">◌</span><strong>Loading preview…</strong></div>';
+      try {
+        const response = await fetch(link.href, { headers: { Accept: 'text/html' } });
+        if (!response.ok) throw new Error('Preview request failed');
+        preview.innerHTML = await response.text();
+        window.history.pushState({}, '', link.dataset.viewUrl);
+      } catch (_) {
+        preview.innerHTML = '<div class="preview-empty"><strong>Could not load this file.</strong><p>Please try again.</p></div>';
+      }
+    }));
+    const switcher = document.querySelector('.ref-switcher');
+    document.querySelector('.switcher-toggle').addEventListener('click', () => { switcher.hidden = false; switcher.querySelector('.ref-search').focus(); });
+    document.querySelector('.switcher-close').addEventListener('click', () => { switcher.hidden = true; });
+    document.querySelectorAll('.ref-tab').forEach((tab) => tab.addEventListener('click', () => { document.querySelectorAll('.ref-tab').forEach((item) => item.setAttribute('aria-selected', String(item === tab))); document.querySelectorAll('[data-ref-panel-content]').forEach((panel) => { panel.hidden = panel.dataset.refPanelContent !== tab.dataset.refPanel; }); }));
+    document.querySelector('.ref-search').addEventListener('input', (event) => { const query = event.target.value.toLowerCase(); document.querySelectorAll('[data-ref-name]').forEach((item) => { item.hidden = !item.dataset.refName.includes(query); }); });
+  </script>
+</section>

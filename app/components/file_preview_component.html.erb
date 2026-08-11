@@ -1,0 +1,5 @@
+<section class="inline-file-preview" id="file-preview">
+  <style><%= Rouge::Themes::ThankfulEyes.render(scope: '.inline-file-preview .highlight') %></style>
+  <div class="preview-header"><strong><%= @path %></strong><span><%= language %></span></div>
+  <div class="highlight"><pre><code><%= highlighted_content %></code></pre></div>
+</section>

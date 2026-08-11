@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Commits · <%= @repository.owner.login %>/<%= @repository.name %> · Forge</title>
+    <style>
+      body { margin: 0; color: #c9d1d9; background: #0d1117; font: 16px/1.5 system-ui, sans-serif; } header { padding: 1rem max(5vw, 1.5rem); background: #161b22; border-bottom: 1px solid #30363d; } main { max-width: 960px; margin: 2rem auto; padding: 0 1.5rem; } a { color: #58a6ff; text-decoration: none; } h1 { color: #f0f6fc; font-size: 1.5rem; } .branch { color: #8b949e; font-weight: 400; } .commit-list { border: 1px solid #30363d; border-radius: 6px; overflow: hidden; } .commit { display: grid; grid-template-columns: 1fr auto; gap: 1rem; padding: 1rem; border-bottom: 1px solid #30363d; } .commit:last-child { border-bottom: 0; } .commit strong { color: #f0f6fc; } .commit p { margin: .25rem 0 0; color: #8b949e; font-size: .9rem; } code { color: #58a6ff; background: #161b22; padding: .15rem .35rem; border-radius: 4px; height: fit-content; } .empty { padding: 1rem; color: #8b949e; }
+    </style>
+  </head>
+  <body>
+    <header><strong>◈ Forge</strong></header>
+    <main>
+      <a href="<%= repository_path(@repository.owner.login, @repository.name) %>">← <%= @repository.owner.login %>/<%= @repository.name %></a>
+      <h1>Commits <span class="branch">on <%= @branch %></span></h1>
+      <section class="commit-list"><% if @commits.any? %><% @commits.each do |commit| %><article class="commit"><div><a href="<%= repository_commit_path(@repository.owner.login, @repository.name, commit.sha) %>"><strong><%= commit.message %></strong></a><p>Committed <%= time_ago_in_words(commit.created_at) %> ago</p></div><a href="<%= repository_commit_path(@repository.owner.login, @repository.name, commit.sha) %>"><code title="<%= commit.sha %>"><%= commit.sha.first(7) %></code></a></article><% end %><% else %><p class="empty">No commits recorded for this branch.</p><% end %></section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,2 @@
+class FilePreviewComponent < FileDetailComponent
+end

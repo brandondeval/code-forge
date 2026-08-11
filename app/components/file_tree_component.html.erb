@@ -1,0 +1,10 @@
+<div class="file-tree" style="--tree-depth: <%= @depth %>">
+  <% entries.each do |entry| %>
+    <% if entry.directory %>
+      <div class="tree-folder"><button class="folder-toggle" type="button" aria-expanded="false"><span class="folder-chevron">›</span><span class="file-icon">▰</span><span><%= entry.name %></span></button><time datetime="<%= entry.updated_at.iso8601 %>"><%= time_ago_in_words(entry.updated_at) %> ago</time></div>
+      <div class="tree-children" hidden><%= render FileTreeComponent.new(repository: @repository, directory: child_directory(entry), path: entry.path, depth: @depth + 1, ref_params: @ref_params) %></div>
+    <% else %>
+      <div class="tree-file"><a class="file-link" href="<%= repository_file_preview_path(@repository.owner.login, @repository.name, file: entry.path) %>" data-view-url="<%= repository_path(@repository.owner.login, @repository.name, file: entry.path, **@ref_params) %>"><span class="file-icon">▱</span><span><%= entry.name %></span></a><time datetime="<%= entry.updated_at.iso8601 %>"><%= time_ago_in_words(entry.updated_at) %> ago</time></div>
+    <% end %>
+  <% end %>
+</div>

@@ -1,0 +1,72 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: forge_development
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d forge_development"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+    environment:
+      RAILS_ENV: development
+      DATABASE_HOST: db
+      DATABASE_NAME: forge_development
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      JWT_SECRET: ${JWT_SECRET:-development-only-change-this-secret}
+      GIT_ROOT: /git
+      GIT_CLONE_BASE_URL: ${GIT_CLONE_BASE_URL:-ssh://forge@localhost:2222}
+      GIT_SERVICE_UID: 1000
+      GIT_SERVICE_GID: 1000
+    command: sh -c "(bundle check || bundle install) && rm -f tmp/pids/server.pid && bin/rails db:prepare && bin/rails server -b 0.0.0.0"
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - bundle_cache:/usr/local/bundle
+      - git_data:/git
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:5173"
+    environment:
+      # Docker Desktop bind mounts do not consistently emit native filesystem events.
+      # Polling keeps Vite's HMR updates reliable on Windows.
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "300"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    depends_on:
+      - api
+
+  git:
+    build:
+      context: .
+      dockerfile: Dockerfile.git
+    environment:
+      GIT_PASSWORD: ${GIT_PASSWORD:-forge}
+    ports:
+      - "2222:22"
+    volumes:
+      - git_data:/git
+
+volumes:
+  postgres_data:
+  bundle_cache:
+  frontend_node_modules:
+  git_data:

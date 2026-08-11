@@ -1,0 +1,8 @@
+.git
+.bundle
+log
+tmp
+storage
+frontend/node_modules
+frontend/dist
+.env

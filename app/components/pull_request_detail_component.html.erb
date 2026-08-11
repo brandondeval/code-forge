@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+  <head>
+    <title><%= @pull_request.title %> · <%= @repository.name %> · Forge</title>
+    <style>
+      body { font: 16px/1.5 system-ui, sans-serif; color: #1f2328; margin: 0; } header { background: #24292f; color: white; padding: 1rem max(5vw, 1.5rem); } main { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; } a { color: #0969da; text-decoration: none; } h1 { margin-bottom: .25rem; } .number { color: #57606a; font-weight: 400; } .status { display: inline-block; border-radius: 2em; padding: .2rem .65rem; font-size: .85rem; font-weight: 650; color: white; text-transform: capitalize; } .state--open { background: #1f883d; } .state--closed { background: #8250df; } .state--merged { background: #8250df; } .byline, .branches { color: #57606a; } .branches { margin: 1.25rem 0; padding: .8rem 1rem; background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; } .description { border: 1px solid #d0d7de; border-radius: 6px; margin-top: 1.5rem; } .description h2 { margin: 0; padding: .75rem 1rem; font-size: 1rem; border-bottom: 1px solid #d0d7de; } .description div { padding: 1rem; white-space: pre-wrap; } .empty { color: #57606a; font-style: italic; }
+    </style>
+  </head>
+  <body>
+    <header><strong>◈ Forge</strong></header>
+    <main>
+      <a href="<%= repository_path(@repository.owner.login, @repository.name) %>">← <%= @repository.owner.login %>/<%= @repository.name %></a>
+      <h1><%= @pull_request.title %> <span class="number">#<%= @pull_request.id %></span></h1>
+      <p class="byline"><span class="status <%= state_class %>"><%= @pull_request.state %></span> <strong><%= @pull_request.author.login %></strong> wants to merge changes into <strong><%= @pull_request.base_branch %></strong> · opened <%= opened_on %></p>
+      <div class="branches"><%= @pull_request.head_branch %> → <%= @pull_request.base_branch %></div>
+      <section class="description"><h2>Description</h2><div class="<%= "empty" if @pull_request.body.blank? %>"><%= @pull_request.body.presence || "No description provided." %></div></section>
+      <%= render PullRequestDiffComponent.new(repository: @repository, pull_request: @pull_request) %>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,56 @@
+services:
+  backend:
+    build:
+      context: ./backend # Path to your Node.js backend directory
+      dockerfile: backend.Dockerfile
+    ports:
+      - "3001:3001" # Host_Port:Container_Port
+    develop:
+      watch:
+        - action: sync # Sync backend code changes to the container like hot-reload
+          path: ./backend
+          target: /app
+          ignore:
+            - node_modules/ # Ignore node_modules to avoid syncing issues
+            - data/ # Ignore data directory to avoid syncing issues
+        - action: rebuild # Rebuild the backend when changes are detected in package.json
+          path: ./backend/package.json
+    volumes:
+#      - ./backend:/app # Mount your backend code into the container
+      - backend-node-modules:/app/node_modules # Separate volume for node_modules to avoid issues
+#      - backend-data:/app/data # Volume for SQLite database persistence
+      - ./backend/data:/app/data
+    working_dir: /app
+    environment:
+      NODE_ENV: development
+      DATABASE_PATH: /app/data/database.sqlite # Path to SQLite DB inside container
+      DATABASE_URL: sqlite:///app/data/app.db
+    command: npm start # Or your preferred command to start the Node.js app
+
+  frontend:
+    build:
+      context: ./frontend # Path to your React frontend directory
+      dockerfile: frontend.Dockerfile
+    ports:
+      - "3000:80" # Host_Port:Container_Port (React build will be served on port 80 by Nginx)
+    develop:
+      watch:
+        - action: sync # Sync frontend code changes to the container like vite hot-reload
+          path: ./frontend
+          target: /app
+          ignore:
+            - node_modules/ # Ignore node_modules to avoid syncing issues
+        - action: rebuild # Rebuild the frontend when changes are detected in package.json
+          path: ./frontend/package.json
+    volumes:
+      - ./frontend:/app # Mount your frontend code into the container (for dev/build context)
+    depends_on:
+      - backend # Ensure backend starts before frontend
+    working_dir: /app
+    # In a production setup, Nginx serves the build. For development, you might run 'npm start' in frontend
+    # However, for a docker-compose setup, it's typical to build the app and serve static files.
+    # The backend.frontend.Dockerfile for frontend will handle building the React app and then serving it.
+
+volumes:
+  backend-node-modules:
+  backend-data:

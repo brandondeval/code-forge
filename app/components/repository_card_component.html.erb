@@ -1,0 +1,8 @@
+<article class="repository-card">
+  <div>
+    <h2><%= @repository.owner.login %>/<%= @repository.name %></h2>
+    <p><%= @repository.description.presence || "No description" %></p>
+  </div>
+  <span class="badge <%= visibility_class %>"><%= @repository.visibility %></span>
+  <footer>★ <%= @repository.stars_count %> · <%= @repository.issues.open.count %> open issues</footer>
+</article>
