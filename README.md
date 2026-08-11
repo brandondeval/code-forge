@@ -1,6 +1,44 @@
 # Forge
 
+!! IN PROGRESS !!
+
 A GitHub-inspired code-hosting starter: Rails owns the API and server-rendered component previews; a Vite React client is delivered as a custom element (`<forge-app>`).
+
+## Code Viewer
+
+<img src="public/code-overview.png" width="75%">
+
+## User View
+
+<img src="public/user-view.png" width="75%">
+
+## Create Repo
+
+<img src="public/create-repo.png" width="75%">
+
+## Create PR
+
+<img src="public/create-pr.png" width="75%">
+
+## PR List
+
+<img src="public/pr-list.png" width="75%">
+
+## View PR
+
+<img src="public/pr-view.png" width="75%">
+
+## Branch List
+
+<img src="public/branche-list.png" width="75%">
+
+## Commit List
+
+<img src="public/commit-list.png" width="75%">
+
+## Commit Diff
+
+<img src="public/commit-diff.png" width="75%">
 
 ## Prerequisites
 

@@ -13,14 +13,13 @@ class RepositoryPullRequestsController < ApplicationController
 
   def create
     repository = find_repository
-    author = user_from_token(params[:access_token])
     pull_request = PullRequest.new(pull_request_params.merge(repository: repository))
-    pull_request.author = author if author
+    pull_request.author = current_user if current_user
 
-    if author && pull_request.save
+    if current_user && pull_request.save
       redirect_to repository_path(repository.owner.login, repository.name), notice: "Pull request created."
     else
-      pull_request.errors.add(:base, "Access token is invalid") unless author
+      pull_request.errors.add(:base, "Sign in before creating a pull request") unless current_user
       render RepositoryDetailComponent.new(repository: repository, pull_request: pull_request), status: :unprocessable_entity
     end
   end

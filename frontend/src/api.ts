@@ -60,10 +60,23 @@ export async function authenticate(apiBase: string, mode: "sign-in" | "register"
   const body = mode === "register"
     ? { user: { login: values.login, email: values.email, password: values.password, password_confirmation: values.passwordConfirmation } }
     : { login: values.login, password: values.password, grant_type: "password" };
-  const response = await fetch(`${apiBase.replace(/\/api\/v1$/, "")}/${endpoint}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const response = await fetch(`${apiBase.replace(/\/api\/v1$/, "")}/${endpoint}`, { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   const payload = await response.json();
   if (!response.ok) throw new Error(payload.errors?.join(", ") || payload.error || "Authentication failed");
   return payload;
+}
+
+export async function establishBrowserSession(apiBase: string, token: string): Promise<void> {
+  const response = await fetch(`${apiBase.replace(/\/api\/v1$/, "")}/oauth/session`, {
+    method: "POST",
+    credentials: "include",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!response.ok) throw new Error("Could not establish browser session");
+}
+
+export async function endBrowserSession(apiBase: string): Promise<void> {
+  await fetch(`${apiBase.replace(/\/api\/v1$/, "")}/oauth/logout`, { method: "POST", credentials: "include" });
 }
 
 export async function resetPassword(apiBase: string, values: { login: string; password: string; passwordConfirmation: string }): Promise<void> {

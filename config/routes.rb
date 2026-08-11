@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
   post "oauth/register", to: "sessions#register"
   post "oauth/token", to: "sessions#create"
+  post "oauth/session", to: "sessions#establish"
+  post "oauth/logout", to: "sessions#destroy"
   post "oauth/forgot_password", to: "sessions#forgot_password"
   namespace :api do
     namespace :v1 do

@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { account, authenticate, createRepository, importRepository, publicAccount, repositories, resetPassword, type Account, type Repository } from "./api";
+import { account, authenticate, createRepository, endBrowserSession, establishBrowserSession, importRepository, publicAccount, repositories, resetPassword, type Account, type Repository } from "./api";
 import "./styles.css";
 
 export function App({ apiBase }: { apiBase: string }) {
@@ -18,6 +18,7 @@ export function App({ apiBase }: { apiBase: string }) {
   const [token, setToken] = useState(() => localStorage.getItem("forge-access-token") || "");
 
   useEffect(() => { repositories(apiBase).then(setItems).catch((e: Error) => setError(e.message)); }, [apiBase]);
+  useEffect(() => { if (token) void establishBrowserSession(apiBase, token).catch(() => undefined); }, [apiBase, token]);
   useEffect(() => {
     const onPopState = () => { const login = window.location.pathname.match(/^\/users\/([^/]+)$/)?.[1] || null; setAccountLogin(login); setScreen(login ? "account" : "explore"); };
     window.addEventListener("popstate", onPopState); return () => window.removeEventListener("popstate", onPopState);
@@ -32,7 +33,7 @@ export function App({ apiBase }: { apiBase: string }) {
   }
   function goToAccount(login: string) { window.history.pushState({}, "", `/users/${encodeURIComponent(login)}`); setAccountLogin(login); setScreen("account"); }
   function goToExplore() { window.history.pushState({}, "", "/"); setScreen("explore"); }
-  function signOut() { localStorage.removeItem("forge-access-token"); localStorage.removeItem("forge-login"); setToken(""); setAccountDetails(null); setShowRepositoryForm(false); setShowUploadForm(false); goToExplore(); }
+  async function signOut() { try { await endBrowserSession(apiBase); } finally { localStorage.removeItem("forge-access-token"); localStorage.removeItem("forge-login"); setToken(""); setAccountDetails(null); setShowRepositoryForm(false); setShowUploadForm(false); goToExplore(); } }
   async function beginAccount() { if (!token) return setShowAuth(true); try { const details = await account(apiBase, token); localStorage.setItem("forge-login", details.user.login); setAccountDetails(details); goToAccount(details.user.login); } catch (e) { setError(e instanceof Error ? e.message : "Could not load account"); } }
   async function submitAuth(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); const form = new FormData(event.currentTarget); setError(""); setBusy(true);
